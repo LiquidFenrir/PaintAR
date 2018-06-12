@@ -147,8 +147,9 @@ namespace Game
             modifier *= modifierR*modifierG*modifierB;
         }
 
-        DEBUG("modifier: %f\n", modifier);
-        *damage = water.damage * modifier;
+        double actual_damage = water.damage * modifier;
+        DEBUG("modifier: %f, damage: %f\n", modifier, actual_damage);
+        *damage = actual_damage;
         this->health -= *damage;
         return this->health <= 0;
     }
@@ -199,8 +200,8 @@ namespace Game
 
         this->selectedWater = 0;
         this->waterProperties.push_back({clearWaterColor, 1});
-        this->waterProperties.push_back({C2D_Color32(0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF), 3});
-        this->waterProperties.push_back({C2D_Color32(colorBeforeDamageLower, colorBeforeDamageLower, colorBeforeDamageLower, 0xFF), 3});
+        this->waterProperties.push_back({C2D_Color32(0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF), 5});
+        this->waterProperties.push_back({C2D_Color32(colorBeforeDamageLower, colorBeforeDamageLower, colorBeforeDamageLower, 0xFF), 5});
 
         this->tX = this->tY = this->tZ = 0.0f;
     }
@@ -300,7 +301,7 @@ namespace Game
                 sprintf(buffer, "%i", this->lastDamage);
 
                 this->addText(dynamicBuf, buffer);
-                C2D_DrawText(this->text.back(), C2D_WithColor, 200.0f, 120.0f, 0.65f, textScale, textScale, textColor);
+                C2D_DrawText(this->text.back(), C2D_WithColor, 220.0f, 110.0f, 0.65f, textScale, textScale, textColor);
                 delete this->text.back();
                 this->text.pop_back();
 
@@ -323,7 +324,6 @@ namespace Game
             C2D_DrawText(this->text[i], C2D_WithColor, 5, 5+i*15, 0.5f, textScale, textScale, textColor);
         }
 
-        C2D_TextBufClear(dynamicBuf);
         float y = 5+i*15;
         for(i = 0; i != INFO_LINES; i++)
         {
@@ -332,6 +332,7 @@ namespace Game
             delete this->text.back();
             this->text.pop_back();
         }
+
         y += 15*3;
         sprintf(buffer[0], "Paint splats left: %u", this->paintSplashes.size());
         this->addText(dynamicBuf, buffer[0]);
@@ -344,6 +345,8 @@ namespace Game
     void Game::draw()
     {
         C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+
+        C2D_TextBufClear(dynamicBuf);
 
         C2D_SceneBegin(top);
         C2D_TargetClear(top, backgroundColor);
