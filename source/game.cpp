@@ -8,12 +8,25 @@
 
 #define GYROSCOPE_SENSITIVITY (double)14.375
 
+typedef enum {
+    DEADZONE_PITCH = 10,
+    DEADZONE_YAW = 10,
+    DEADZONE_ROLL = 25,
+} GyroDeadzone;
+
 void ComplementaryFilter(accelVector vector, angularRate rate, double *pitch, double *roll, double *yaw)
 {
+    if(abs(rate.x) < DEADZONE_PITCH)
+        rate.x = 0;
+    if(abs(rate.y) < DEADZONE_YAW)
+        rate.x = 0;
+    if(abs(rate.z) < DEADZONE_ROLL)
+        rate.x = 0;
+
     // Integrate the gyroscope data -> int(angularSpeed) = angle
     *pitch += ((double)rate.x / GYROSCOPE_SENSITIVITY) * dt; // Angle around the X-axis
     *roll -= ((double)rate.z / GYROSCOPE_SENSITIVITY) * dt;  // Angle around the Z-axis
-    *yaw -= ((double)rate.y / GYROSCOPE_SENSITIVITY) * dt;   // Angle around the Y-axis
+    // *yaw -= ((double)rate.y / GYROSCOPE_SENSITIVITY) * dt;   // Angle around the Y-axis
 
     // Compensate for drift with accelerometer data if !bullshit
     // Sensitivity = -2 to 2 G at 16Bit -> 2G = 32768 && 0.5G = 8192
@@ -50,7 +63,18 @@ static inline u32 randomColor()
 static double calculateModifier(u8 paintPart, u8 waterPart)
 {
     if(abs(paintPart-waterPart) > Game::colorBeforeDamageLower)
-        return paintPart > waterPart ? (double)waterPart/(double)paintPart : (double)paintPart/(double)waterPart;
+    {
+        double part = 1.0f;
+        if(paintPart > waterPart)
+        {
+            part = (double)waterPart/(double)paintPart;
+        }
+        else
+        {
+            part = (double)paintPart/(double)waterPart;
+        }
+        return part;
+    }
     else
         return 1.0f;
 }
@@ -90,7 +114,7 @@ namespace Game
 
     bool PaintSplash::isVisible(double tX, double tY, double tZ)
     {
-        double angleVisible = 80.0f;
+        double angleVisible = 67.5f;
         if(this->tX - angleVisible <= tX && tX <= this->tX + angleVisible)
             if(this->tY - angleVisible <= tY && tY <= this->tY + angleVisible)
                 if(this->tZ - angleVisible <= tZ && tZ <= this->tZ + angleVisible)
@@ -132,6 +156,7 @@ namespace Game
         double modifier = 1.0f;
         if(water.color != clearWaterColor)
         {
+            DEBUG("%.8lx : %.8lx\n", this->color, water.color);
             u8 thisR = this->color >> 24 & 0xFF;
             u8 thisG = this->color >> 16 & 0xFF;
             u8 thisB = this->color >> 8 & 0xFF;
@@ -369,7 +394,7 @@ namespace Game
 
         hidAccelRead(&this->vector);
         hidGyroRead(&this->rate);
-        // ComplementaryFilter(this->vector, this->rate, &this->tX, &this->tY, &this->tZ);
+        ComplementaryFilter(this->vector, this->rate, &this->tX, &this->tY, &this->tZ);
 
         u32 kDown = hidKeysDown();
         u32 kHeld = hidKeysHeld();
