@@ -63,8 +63,8 @@ LOGO                :=
 
 # If left blank, makerom will use default values (0xff3ff and CTR-P-CTAP, respectively)
 # Be careful if UNIQUE_ID is the same as other apps: it will overwrite the previously installed one
-UNIQUE_ID           :=	0x07667
-PRODUCT_CODE        :=	CTR-HB-TMPL
+UNIQUE_ID           :=	0x84961
+PRODUCT_CODE        :=	CTR-HB-PTAR
 
 # Don't really need to change this
 ICON_FLAGS          :=	nosavebackups,visible
