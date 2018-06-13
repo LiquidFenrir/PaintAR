@@ -73,7 +73,7 @@ namespace Game
             u32 waterLevel;
             bool firing;
             bool overloaded;
-            int hitCounter;
+            int hitCounter, lastBossSpawn;
             int lastDamage;
 
             angularRate rate;

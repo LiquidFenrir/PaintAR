@@ -535,10 +535,11 @@ namespace Game
             }
             if(i != this->paintSplashes.size()) // If break happened == 1 kill
             {
-                if(this->hitCounter % KILLS_TO_BOSS == 0)
+                if(this->hitCounter - this->lastBossSpawn >= KILLS_TO_BOSS)
                 {
                     DEBUG("adding boss\n");
                     this->paintSplashes.push_back(new PaintSplash(true));
+                    this->lastBossSpawn = this->hitCounter;
                 }
             }
         }
