@@ -247,6 +247,7 @@ namespace Game
         this->dynamicBuf = C2D_TextBufNew(512);
 
         this->addText(this->staticBuf, "Press \uE000 to fire a water beam!");
+        this->addText(this->staticBuf, "Press \uE002 to lock onto the boss!");
         this->addText(this->staticBuf, "Press \uE004 or \uE005 to change water type!");
         this->addText(this->staticBuf, "Press START to exit.");
 
