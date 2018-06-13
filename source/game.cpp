@@ -284,34 +284,37 @@ namespace Game
     void Game::drawHitCounter()
     {
         float start_x = 400 - 128 - 8;
-        C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_counter_overlay_idx), start_x, 198.0f, 0.7f, NULL, 1.0f, 1.0f);
+        float y = 199.0f;
+        C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_counter_overlay_idx), start_x, y, 0.7f, NULL, 1.0f, 1.0f);
         constexpr size_t DIGITS_AMOUNT = 8;
         start_x += 128 - 21;
         for(size_t i = 0, big = 1; i != DIGITS_AMOUNT; i++, big *= 10)
         {
             int cnt = (this->hitCounter % (big*10))/big;
-            C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_0_idx+cnt), start_x - ((12+2)*i), 203.0f, 0.8f, NULL, 1.0f, 1.0f);
+            C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_0_idx+cnt), start_x - ((12+2)*i), y+5, 0.8f, NULL, 1.0f, 1.0f);
         }
     }
 
     void Game::drawOverlay()
     {
+        C2D_DrawRectSolid(182.0f, 169.0f, 0.55f, 36.0f, 18.0f, this->waterProperties[this->selectedWater].color);
         C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_gun_idx), 0.0f, 0.0f, 0.6f, NULL, 1.0f, 1.0f);
-        C2D_DrawRectSolid(15.0f, 205.0f, 0.7f, this->waterLevel, 20, this->waterProperties[this->selectedWater].color);
 
+        C2D_DrawRectSolid(15.0f, 205.0f, 0.7f, this->waterLevel, 20, this->waterProperties[this->selectedWater].color);
         if(this->overloaded)
             C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_water_overloaded_idx), 13.0f, 203.0f, 0.8f, NULL, 1.0f, 1.0f);
         else
             C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_water_overlay_idx), 13.0f, 203.0f, 0.8f, NULL, 1.0f, 1.0f);
 
         float start_x = 200 - ((this->waterProperties.size()*32)/2.0f);
+        float y = 199.0f;
         for(size_t i = 0; i < this->waterProperties.size(); i++)
         {
-            C2D_DrawRectSolid(start_x + 4 + 32*i, 198.0f + 4, 0.7f, 24, 24, this->waterProperties[i].color);
+            C2D_DrawRectSolid(start_x + 4 + 32*i, y+4, 0.7f, 24, 24, this->waterProperties[i].color);
             if(i == (size_t)this->selectedWater)
-                C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_water_selected_idx), start_x + 32*i, 198.0f, 0.8f, NULL, 1.0f, 1.0f);
+                C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_water_selected_idx), start_x + 32*i, y, 0.8f, NULL, 1.0f, 1.0f);
             else
-                C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_water_type_idx), start_x + 32*i, 198.0f, 0.8f, NULL, 1.0f, 1.0f);
+                C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_water_type_idx), start_x + 32*i, y, 0.8f, NULL, 1.0f, 1.0f);
         }
 
         this->drawHitCounter();
