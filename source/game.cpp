@@ -89,7 +89,7 @@ namespace Game
     static constexpr int SECONDS_TO_SPAWN = 10;
 
     static constexpr double angleVisible = 67.5f;
-    static constexpr double angleCenter = 15.0f;
+    static constexpr double angleCenter = 8.0f;
     static constexpr double BASE_HEALTH = 50;
     static constexpr double BOSS_HEALTH_MODIFIER = 10;
     static auto bossColors = std::array{clearWaterColor, fakeWhiteColor, fakeBlackColor};
