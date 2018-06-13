@@ -10,8 +10,6 @@ namespace Game
     constexpr u32 backgroundColor = C2D_Color32(0x20, 0x20, 0x20, 0xFF); // Some nice gray, taken from QRaken
     constexpr u32 textColor = C2D_Color32f(1,1,1,1); // White
 
-    constexpr u32 clearWaterColor = C2D_Color32(0x00, 0x94, 0xFF, 0xFF);
-
     constexpr double textScale = 0.5f;
 
     constexpr int colorBeforeDamageLower = 0x20;
@@ -21,6 +19,13 @@ namespace Game
         u32 color;
         int damage;
     } WaterProperty;
+
+    typedef enum
+    {
+        BEAM_NONE = -1,
+        BEAM_WATER = 0,
+        BEAM_STEAL = 1,
+    } BeamType;
 
     class PaintSplash
     {
@@ -36,6 +41,7 @@ namespace Game
 
             bool isBoss();
             void getAngles(double* tX, double* tY,double* tZ);
+            u32 getColor();
 
         private:
             double tX, tY, tZ; // angle from normal
@@ -67,11 +73,10 @@ namespace Game
 
             void addText(C2D_TextBuf textBuf, const char* text);
 
-            std::vector<WaterProperty> waterProperties;
-
             int selectedWater;
             u32 waterLevel;
             bool firing;
+            BeamType beamType;
             bool overloaded;
             int hitCounter, lastBossSpawn;
             int lastDamage;

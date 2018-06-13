@@ -81,8 +81,14 @@ static double calculateModifier(u8 paintPart, u8 waterPart)
 
 namespace Game
 {
+    static constexpr u32 clearWaterColor = C2D_Color32(0x00, 0x94, 0xFF, 0xFF);
     static constexpr u32 fakeWhiteColor = C2D_Color32(0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF);
     static constexpr u32 fakeBlackColor = C2D_Color32(colorBeforeDamageLower, colorBeforeDamageLower, colorBeforeDamageLower, 0xFF);
+
+    static WaterProperty clearWater = {clearWaterColor, 1};
+    static WaterProperty whitewater = {fakeWhiteColor, 5};
+    static WaterProperty blackWater = {fakeBlackColor, 5};
+    static auto waterProperties = std::array{clearWater, whitewater, blackWater};
 
     static constexpr int POINTS_FOR_BOSS = 3;
     static constexpr int KILLS_TO_BOSS = 10;
@@ -92,7 +98,6 @@ namespace Game
     static constexpr double angleCenter = 8.0f;
     static constexpr double BASE_HEALTH = 50;
     static constexpr double BOSS_HEALTH_MODIFIER = 10;
-    static auto bossColors = std::array{clearWaterColor, fakeWhiteColor, fakeBlackColor};
 
     enum WaterInfo
     {
@@ -111,8 +116,8 @@ namespace Game
         this->boss = boss;
         if(boss)
         {
-            size_t color = rand() % bossColors.size();
-            this->color = bossColors[color];
+            size_t color = rand() % waterProperties.size();
+            this->color = waterProperties[color].color;
             this->health = BASE_HEALTH*BOSS_HEALTH_MODIFIER;
         }
         else
@@ -222,6 +227,11 @@ namespace Game
         *tZ = this->tZ;
     }
 
+    u32 PaintSplash::getColor()
+    {
+        return this->color;
+    }
+
     Game::Game(int argc, char* argv[])
     {
         APT_GetAppCpuTimeLimit(&this->old_time_limit);
@@ -248,13 +258,16 @@ namespace Game
 
         this->addText(this->staticBuf, "Press \uE000 to fire a water beam!");
         this->addText(this->staticBuf, "Press \uE002 to lock onto the boss!");
+        this->addText(this->staticBuf, "Press \uE003 to steal a paint splat's color!");
         this->addText(this->staticBuf, "Press \uE004 or \uE005 to change water type!");
+        this->addText(this->staticBuf, "The closer in color, the more damage you do!");
         this->addText(this->staticBuf, "Press START to exit.");
 
         startCameraThread();
 
         this->waterLevel = WATER_LEVEL_MAX;
         this->firing = false;
+        this->beamType = BEAM_NONE;
         this->overloaded = false;
 
         this->lastTime = osGetTime();
@@ -268,10 +281,6 @@ namespace Game
         this->frameCounter = 0;
 
         this->selectedWater = 0;
-        this->waterProperties.push_back({clearWaterColor, 1});
-        this->waterProperties.push_back({fakeWhiteColor, 5});
-        this->waterProperties.push_back({fakeBlackColor, 5});
-
         this->tX = this->tY = this->tZ = 0.0f;
     }
 
@@ -341,20 +350,20 @@ namespace Game
 
     void Game::drawOverlay()
     {
-        C2D_DrawRectSolid(182.0f, 169.0f, 0.55f, 36.0f, 18.0f, this->waterProperties[this->selectedWater].color);
+        C2D_DrawRectSolid(182.0f, 169.0f, 0.55f, 36.0f, 18.0f, waterProperties[this->selectedWater].color);
         C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_gun_idx), 0.0f, 0.0f, 0.6f, NULL, 1.0f, 1.0f);
 
-        C2D_DrawRectSolid(15.0f, 205.0f, 0.7f, this->waterLevel, 20, this->waterProperties[this->selectedWater].color);
+        C2D_DrawRectSolid(15.0f, 205.0f, 0.7f, this->waterLevel, 20, waterProperties[this->selectedWater].color);
         if(this->overloaded)
             C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_water_overloaded_idx), 13.0f, 203.0f, 0.8f, NULL, 1.0f, 1.0f);
         else
             C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_water_overlay_idx), 13.0f, 203.0f, 0.8f, NULL, 1.0f, 1.0f);
 
-        float start_x = 200 - ((this->waterProperties.size()*32)/2.0f);
+        float start_x = 200 - ((waterProperties.size()*32)/2.0f);
         float y = 199.0f;
-        for(size_t i = 0; i < this->waterProperties.size(); i++)
+        for(size_t i = 0; i < waterProperties.size(); i++)
         {
-            C2D_DrawRectSolid(start_x + 4 + 32*i, y+4, 0.7f, 24, 24, this->waterProperties[i].color);
+            C2D_DrawRectSolid(start_x + 4 + 32*i, y+4, 0.7f, 24, 24, waterProperties[i].color);
             if(i == (size_t)this->selectedWater)
                 C2D_DrawImageAt(C2D_SpriteSheetGetImage(spritesheet, sprites_water_selected_idx), start_x + 32*i, y, 0.8f, NULL, 1.0f, 1.0f);
             else
@@ -365,7 +374,7 @@ namespace Game
 
         if(this->firing)
         {
-            C2D_DrawRectSolid(190.0f, 120.0f, 0.7f, 20, 40, this->waterProperties[this->selectedWater].color);
+            C2D_DrawRectSolid(190.0f, 120.0f, 0.7f, 20, 40, waterProperties[this->selectedWater].color);
             if(this->lastDamage != -1)
             {
                 char buffer[128] = {0};
@@ -475,13 +484,13 @@ namespace Game
         {
             this->selectedWater--;
             if(this->selectedWater < 0)
-                this->selectedWater += this->waterProperties.size();
+                this->selectedWater += waterProperties.size();
         }
 
         if(kDown & KEY_R)
         {
             this->selectedWater++;
-            if(this->selectedWater >= (int)this->waterProperties.size())
+            if(this->selectedWater >= (int)waterProperties.size())
                 this->selectedWater = 0;
         }
 
@@ -499,12 +508,24 @@ namespace Game
         this->tX = constrainAngle(this->tX);
         this->tZ = constrainAngle(this->tZ);
 
-        if(!this->overloaded && kHeld & KEY_A && this->waterLevel > 0)
-            this->firing = true;
-        else
-            this->firing = false;
+        this->beamType = BEAM_NONE;
+        this->firing = false;
 
-        if(firing && this->frameCounter % FRAMES_TO_SPEND == 0)
+        if(!this->overloaded)
+        {
+            if(kHeld & KEY_Y)
+            {
+                this->firing = true;
+                this->beamType = BEAM_STEAL;
+            }
+            else if(kHeld & KEY_A && this->waterLevel > 0)
+            {
+                this->firing = true;
+                this->beamType = BEAM_WATER;
+            }
+        }
+
+        if(firing && beamType == BEAM_WATER && this->frameCounter % FRAMES_TO_SPEND == 0)
             this->waterLevel--;
 
         if(this->waterLevel == 0)
@@ -523,7 +544,7 @@ namespace Game
             {
                 if(this->paintSplashes[i]->isInCenter(this->tX, this->tY, this->tZ))
                 {
-                    if(this->paintSplashes[i]->hit(this->waterProperties[this->selectedWater], &this->lastDamage))
+                    if(this->beamType == BEAM_WATER && this->paintSplashes[i]->hit(waterProperties[this->selectedWater], &this->lastDamage))
                     {
                         DEBUG("killed!\n");
                         this->hitCounter += this->paintSplashes[i]->isBoss() ? POINTS_FOR_BOSS : 1;
@@ -531,6 +552,16 @@ namespace Game
                         delete this->paintSplashes[i];
                         this->paintSplashes.erase(this->paintSplashes.begin()+i);
                         break;
+                    }
+                    else if(this->beamType == BEAM_STEAL && this->selectedWater != 0 && !this->paintSplashes[i]->isBoss())
+                    {
+                        u32 newColor = this->paintSplashes[i]->getColor();
+                        if(waterProperties[this->selectedWater].color != newColor)
+                        {
+                            waterProperties[this->selectedWater].color = newColor;
+                            this->waterLevel = 0;
+                            this->overloaded = true;
+                        }
                     }
                 }
             }
