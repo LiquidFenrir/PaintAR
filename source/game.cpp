@@ -81,9 +81,15 @@ static double calculateModifier(u8 paintPart, u8 waterPart)
 
 namespace Game
 {
-    static constexpr int BASE_HEALTH = 50;
+    static constexpr u32 fakeWhiteColor = C2D_Color32(0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF);
+    static constexpr u32 fakeBlackColor = C2D_Color32(colorBeforeDamageLower, colorBeforeDamageLower, colorBeforeDamageLower, 0xFF);
+
     static constexpr int KILLS_TO_BOSS = 10;
     static constexpr int SECONDS_TO_SPAWN = 10;
+
+    static constexpr double BASE_HEALTH = 50;
+    static constexpr double BOSS_HEALTH_MODIFIER = 10;
+    static auto bossColors = std::array{clearWaterColor, fakeWhiteColor, fakeBlackColor};
 
     enum WaterInfo
     {
@@ -98,8 +104,17 @@ namespace Game
         this->tX = random_deg_angle();
         this->tY = random_deg_angle();
         this->tZ = 0;
-        this->color = randomColor();
-        this->health = boss ? BASE_HEALTH*((rand() % 10) + 10) : BASE_HEALTH;
+        if(boss)
+        {
+            size_t color = rand() % bossColors.size();
+            this->color = bossColors[color];
+            this->health = BASE_HEALTH*BOSS_HEALTH_MODIFIER;
+        }
+        else
+        {
+            this->color = randomColor();
+            this->health = BASE_HEALTH;
+        }
     }
 
     PaintSplash::PaintSplash(double tX, double tY, double tZ)
@@ -225,8 +240,8 @@ namespace Game
 
         this->selectedWater = 0;
         this->waterProperties.push_back({clearWaterColor, 1});
-        this->waterProperties.push_back({C2D_Color32(0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF), 5});
-        this->waterProperties.push_back({C2D_Color32(colorBeforeDamageLower, colorBeforeDamageLower, colorBeforeDamageLower, 0xFF), 5});
+        this->waterProperties.push_back({fakeWhiteColor, 5});
+        this->waterProperties.push_back({fakeBlackColor, 5});
 
         this->tX = this->tY = this->tZ = 0.0f;
     }
