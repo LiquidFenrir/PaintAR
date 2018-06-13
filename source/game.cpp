@@ -209,6 +209,18 @@ namespace Game
         return this->health <= 0;
     }
 
+    bool PaintSplash::isBoss()
+    {
+        return this->boss;
+    }
+
+    void PaintSplash::getAngles(double* tX, double* tY,double* tZ);
+    {
+        *tX = this->tX;
+        *tY = this->tY;
+        *tZ = this->tZ;
+    }
+
     Game::Game(int argc, char* argv[])
     {
         APT_GetAppCpuTimeLimit(&this->old_time_limit);
@@ -421,6 +433,11 @@ namespace Game
         C3D_FrameEnd(0);
     }
 
+    void Game::lockOn(const PaintSplash* paintSplash)
+    {
+        paintSplash->getAngles(&this->tX, &this->tY, &this->tZ);
+    }
+
     void Game::update()
     {   
         hidScanInput();
@@ -439,6 +456,18 @@ namespace Game
         }
 
         this->draw();
+
+        if(kDown & KEY_X)
+        {
+            for(auto const paintSplash : this->paintSplashes)
+            {
+                if(paintSplash->isBoss())
+                {
+                    this->lockOn(paintSplash);
+                    break;
+                }
+            }
+        }
 
         if(kDown & KEY_L)
         {

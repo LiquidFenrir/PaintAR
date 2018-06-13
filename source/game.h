@@ -34,6 +34,9 @@ namespace Game
             bool isVisible(double tX, double tY, double tZ);
             void draw(double tX, double tY, double tZ);
 
+            bool isBoss();
+            void getAngles(double* tX, double* tY,double* tZ);
+
         private:
             double tX, tY, tZ; // angle from normal
             double health;
@@ -59,6 +62,8 @@ namespace Game
             void drawText();
 
             void draw();
+
+            void lockOn(const PaintSplash* paintSplash);
 
             void addText(C2D_TextBuf textBuf, const char* text);
 
