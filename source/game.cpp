@@ -106,6 +106,8 @@ namespace Game
         this->tX = random_deg_angle();
         this->tY = random_deg_angle();
         this->tZ = 0;
+
+        this->boss = boss;
         if(boss)
         {
             size_t color = rand() % bossColors.size();
@@ -127,6 +129,7 @@ namespace Game
         this->tZ = dispersion(tZ);
         this->color = randomColor();
         this->health = BASE_HEALTH;
+        this->boss = false;
     }
 
     bool PaintSplash::isVisible(double tX, double tY, double tZ)
@@ -148,20 +151,32 @@ namespace Game
 
         double y_coeff = 1.0f;
         double x_coeff = 1.0f;
+
         y = sin(C3D_AngleFromDegrees(this->tX-tX))*y_coeff;
         x = sin(C3D_AngleFromDegrees(this->tY-tY))*x_coeff;
 
+        if(this->boss)
+        {
+            C2D_SpriteSetPos(&paintSprite, (x+1.0f)*x_orig - 32, (y+1.0f)*y_orig - 32);
+            C2D_SpriteSetScale(&paintSprite, 2.0f, 2.0f);
+        }
+        else
+            C2D_SpriteSetPos(&paintSprite, (x+1.0f)*x_orig - 16, (y+1.0f)*y_orig - 16);
+
         C2D_ImageTint tint;
         C2D_PlainImageTint(&tint, this->color, 1.0f);
-        C2D_SpriteSetPos(&paintSprite, (x+1.0f)*x_orig - 16, (y+1.0f)*y_orig - 16);
         C2D_DrawSpriteTinted(&paintSprite, &tint);
+
+        if(this->boss)
+            C2D_SpriteSetScale(&paintSprite, 1.0f, 1.0f);
     }
 
     bool PaintSplash::isInCenter(double tX, double tY, double tZ)
     {
-        if(this->tX - angleCenter <= tX && tX <= this->tX + angleCenter)
-            if(this->tY - angleCenter <= tY && tY <= this->tY + angleCenter)
-                if(this->tZ - angleCenter <= tZ && tZ <= this->tZ + angleCenter)
+        double actualAngleCenter = this->boss ? angleCenter*2 : angleCenter;
+        if(this->tX - actualAngleCenter <= tX && tX <= this->tX + actualAngleCenter)
+            if(this->tY - actualAngleCenter <= tY && tY <= this->tY + actualAngleCenter)
+                if(this->tZ - actualAngleCenter <= tZ && tZ <= this->tZ + actualAngleCenter)
                     return true;
         return false;
     }

@@ -38,6 +38,7 @@ namespace Game
             double tX, tY, tZ; // angle from normal
             double health;
             u32 color;
+            bool boss;
     };
 
     class Game
