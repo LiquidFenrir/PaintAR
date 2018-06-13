@@ -84,6 +84,7 @@ namespace Game
     static constexpr u32 fakeWhiteColor = C2D_Color32(0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF);
     static constexpr u32 fakeBlackColor = C2D_Color32(colorBeforeDamageLower, colorBeforeDamageLower, colorBeforeDamageLower, 0xFF);
 
+    static constexpr int POINTS_FOR_BOSS = 3;
     static constexpr int KILLS_TO_BOSS = 10;
     static constexpr int SECONDS_TO_SPAWN = 10;
 
@@ -523,11 +524,11 @@ namespace Game
                 {
                     if(this->paintSplashes[i]->hit(this->waterProperties[this->selectedWater], &this->lastDamage))
                     {
-
                         DEBUG("killed!\n");
+                        this->hitCounter += this->paintSplashes[i]->isBoss ? POINTS_FOR_BOSS : 1;
+
                         delete this->paintSplashes[i];
                         this->paintSplashes.erase(this->paintSplashes.begin()+i);
-                        this->hitCounter++;
                         break;
                     }
                 }
