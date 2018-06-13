@@ -43,9 +43,6 @@ void ComplementaryFilter(accelVector vector, angularRate rate, double *pitch, do
     }
 }
 
-static C2D_SpriteSheet spritesheet;
-static C2D_Sprite paintSprite;
-
 static double constrainAngle(double x)
 {
     x = fmod(x + 180, 360);
@@ -81,6 +78,10 @@ static double calculateModifier(u8 paintPart, u8 waterPart)
 
 namespace Game
 {
+    static C2D_SpriteSheet spritesheet;
+    static C2D_Sprite paintSprite;
+    static C2D_Sprite beamSprites[BEAM_TYPE_AMOUNT];
+
     static constexpr u32 clearWaterColor = C2D_Color32(0x00, 0x94, 0xFF, 0xFF);
     static constexpr u32 fakeWhiteColor = C2D_Color32(0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF-colorBeforeDamageLower, 0xFF);
     static constexpr u32 fakeBlackColor = C2D_Color32(colorBeforeDamageLower, colorBeforeDamageLower, colorBeforeDamageLower, 0xFF);
@@ -253,6 +254,13 @@ namespace Game
         C2D_SpriteFromSheet(&paintSprite, spritesheet, sprites_paint_idx);
         C2D_SpriteSetDepth(&paintSprite, 0.55f);
 
+        for(int i = 0; i < BEAM_TYPE_AMOUNT; i++)
+        {
+            C2D_SpriteFromSheet(&beamSprites[i], spritesheet, sprites_beam_water_idx+i);
+            C2D_SpriteSetDepth(&beamSprites[i], 0.7f);
+            C2D_SpriteSetPos(&beamSprites[i], 190.0f, 120.0f);
+        }
+
         this->staticBuf = C2D_TextBufNew(512);
         this->dynamicBuf = C2D_TextBufNew(512);
 
@@ -374,7 +382,12 @@ namespace Game
 
         if(this->firing)
         {
-            C2D_DrawRectSolid(190.0f, 120.0f, 0.7f, 20, 40, waterProperties[this->selectedWater].color);
+            if(this->beamType != BEAM_NONE)
+            {
+                C2D_ImageTint tint;
+                C2D_PlainImageTint(&tint, waterProperties[this->selectedWater].color, 1.0f);
+                C2D_DrawSpriteTinted(&beamSprites[this->beamType], &tint);
+            }
             if(this->lastDamage != -1)
             {
                 char buffer[128] = {0};

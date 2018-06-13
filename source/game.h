@@ -25,6 +25,8 @@ namespace Game
         BEAM_NONE = -1,
         BEAM_WATER = 0,
         BEAM_STEAL = 1,
+
+        BEAM_TYPE_AMOUNT
     } BeamType;
 
     class PaintSplash
