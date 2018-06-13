@@ -181,7 +181,7 @@ namespace Game
         return false;
     }
 
-    bool PaintSplash::hit(const WaterProperty& water, int * damage)
+    bool PaintSplash::hit(const WaterProperty& water, int* damage)
     {
         double modifier = 1.0f;
         if(water.color != clearWaterColor)
@@ -261,7 +261,7 @@ namespace Game
         this->tX = this->tY = this->tZ = 0.0f;
     }
 
-    void Game::addText(C2D_TextBuf textBuf, const char * text)
+    void Game::addText(C2D_TextBuf textBuf, const char* text)
     {
         C2D_Text* c2dtext = new C2D_Text;
         C2D_TextParse(c2dtext, textBuf, text);

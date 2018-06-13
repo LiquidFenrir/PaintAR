@@ -29,7 +29,7 @@ namespace Game
             PaintSplash(double tX, double tY, double tZ);
 
             bool isInCenter(double tX, double tY, double tZ);
-            bool hit(const WaterProperty& water, int * damage);
+            bool hit(const WaterProperty& water, int* damage);
 
             bool isVisible(double tX, double tY, double tZ);
             void draw(double tX, double tY, double tZ);
@@ -60,7 +60,7 @@ namespace Game
 
             void draw();
 
-            void addText(C2D_TextBuf textBuf, const char * text);
+            void addText(C2D_TextBuf textBuf, const char* text);
 
             std::vector<WaterProperty> waterProperties;
 
