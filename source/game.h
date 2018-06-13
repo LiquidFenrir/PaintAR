@@ -63,7 +63,7 @@ namespace Game
 
             void draw();
 
-            void lockOn(const PaintSplash* paintSplash);
+            void lockOn(PaintSplash* paintSplash);
 
             void addText(C2D_TextBuf textBuf, const char* text);
 

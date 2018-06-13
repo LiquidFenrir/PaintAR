@@ -215,7 +215,7 @@ namespace Game
         return this->boss;
     }
 
-    void PaintSplash::getAngles(double* tX, double* tY,double* tZ);
+    void PaintSplash::getAngles(double* tX, double* tY,double* tZ)
     {
         *tX = this->tX;
         *tY = this->tY;
@@ -434,7 +434,7 @@ namespace Game
         C3D_FrameEnd(0);
     }
 
-    void Game::lockOn(const PaintSplash* paintSplash)
+    void Game::lockOn(PaintSplash* paintSplash)
     {
         paintSplash->getAngles(&this->tX, &this->tY, &this->tZ);
     }
@@ -460,7 +460,7 @@ namespace Game
 
         if(kDown & KEY_X)
         {
-            for(auto const paintSplash : this->paintSplashes)
+            for(auto paintSplash : this->paintSplashes)
             {
                 if(paintSplash->isBoss())
                 {
@@ -525,7 +525,7 @@ namespace Game
                     if(this->paintSplashes[i]->hit(this->waterProperties[this->selectedWater], &this->lastDamage))
                     {
                         DEBUG("killed!\n");
-                        this->hitCounter += this->paintSplashes[i]->isBoss ? POINTS_FOR_BOSS : 1;
+                        this->hitCounter += this->paintSplashes[i]->isBoss() ? POINTS_FOR_BOSS : 1;
 
                         delete this->paintSplashes[i];
                         this->paintSplashes.erase(this->paintSplashes.begin()+i);
