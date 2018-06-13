@@ -87,6 +87,8 @@ namespace Game
     static constexpr int KILLS_TO_BOSS = 10;
     static constexpr int SECONDS_TO_SPAWN = 10;
 
+    static constexpr double angleVisible = 67.5f;
+    static constexpr double angleCenter = 15.0f;
     static constexpr double BASE_HEALTH = 50;
     static constexpr double BOSS_HEALTH_MODIFIER = 10;
     static auto bossColors = std::array{clearWaterColor, fakeWhiteColor, fakeBlackColor};
@@ -129,7 +131,6 @@ namespace Game
 
     bool PaintSplash::isVisible(double tX, double tY, double tZ)
     {
-        double angleVisible = 67.5f;
         if(this->tX - angleVisible <= tX && tX <= this->tX + angleVisible)
             if(this->tY - angleVisible <= tY && tY <= this->tY + angleVisible)
                 if(this->tZ - angleVisible <= tZ && tZ <= this->tZ + angleVisible)
@@ -158,7 +159,6 @@ namespace Game
 
     bool PaintSplash::isInCenter(double tX, double tY, double tZ)
     {
-        double angleCenter = 20.0f;
         if(this->tX - angleCenter <= tX && tX <= this->tX + angleCenter)
             if(this->tY - angleCenter <= tY && tY <= this->tY + angleCenter)
                 if(this->tZ - angleCenter <= tZ && tZ <= this->tZ + angleCenter)
