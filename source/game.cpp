@@ -530,7 +530,7 @@ namespace Game
 
         if(!this->overloaded)
         {
-            if(kHeld & KEY_Y)
+            if(kHeld & KEY_Y && this->selectedWater != 0)
             {
                 this->firing = true;
                 this->beamType = BEAM_STEAL;
