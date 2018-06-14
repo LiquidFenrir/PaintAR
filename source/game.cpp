@@ -199,7 +199,6 @@ namespace Game
         double modifier = 1.0f;
         if(water.color != clearWaterColor)
         {
-            DEBUG("%.8lx : %.8lx\n", this->color, water.color);
             u8 thisR = this->color >> 24 & 0xFF;
             u8 thisG = this->color >> 16 & 0xFF;
             u8 thisB = this->color >> 8 & 0xFF;
@@ -216,7 +215,6 @@ namespace Game
         }
 
         double actual_damage = water.damage * modifier;
-        DEBUG("modifier: %f, damage: %f\n", modifier, actual_damage);
         *damage = actual_damage;
         this->health -= *damage;
         return this->health <= 0;
@@ -245,8 +243,8 @@ namespace Game
         APT_SetAppCpuTimeLimit(30);
 
         romfsInit();
-        HIDUSER_EnableAccelerometer();
-        HIDUSER_EnableGyroscope();
+        DEBUG("%.8lx\n", HIDUSER_EnableAccelerometer());
+        DEBUG("%.8lx\n", HIDUSER_EnableGyroscope());
 
         gfxInitDefault();
         C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
