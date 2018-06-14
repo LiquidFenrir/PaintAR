@@ -162,16 +162,22 @@ namespace Game
         y = sin(C3D_AngleFromDegrees(this->tX-tX))*y_coeff;
         x = sin(C3D_AngleFromDegrees(this->tY-tY))*x_coeff;
 
+        u8 alpha = 127;
         if(this->boss)
         {
             C2D_SpriteSetPos(&paintSprite, (x+1.0f)*x_orig - 32, (y+1.0f)*y_orig - 32);
             C2D_SpriteSetScale(&paintSprite, 2.0f, 2.0f);
+            alpha += this->health*128/(BASE_HEALTH*BOSS_HEALTH_MODIFIER);
         }
         else
+        {
             C2D_SpriteSetPos(&paintSprite, (x+1.0f)*x_orig - 16, (y+1.0f)*y_orig - 16);
+            alpha += this->health*128/BASE_HEALTH;
+        }
 
+        u32 color = (this->color & 0x00FFFFFF) | (alpha << 24);
         C2D_ImageTint tint;
-        C2D_PlainImageTint(&tint, this->color, 1.0f);
+        C2D_PlainImageTint(&tint, color, 1.0f);
         C2D_DrawSpriteTinted(&paintSprite, &tint);
 
         if(this->boss)
